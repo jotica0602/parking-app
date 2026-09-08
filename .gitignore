@@ -32,3 +32,5 @@ Thumbs.db
 
 # Lock files
 package-lock.json
+
+docs/
