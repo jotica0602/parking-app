@@ -7,7 +7,7 @@ export interface AuthUser {
   role: UserRole;
 }
 
-/** Inyecta el usuario autenticado (extraído del JWT) en el handler. */
+// Injects the authenticated user (extracted from the JWT) into the handler
 export const CurrentUser = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): AuthUser => {
     const request = ctx.switchToHttp().getRequest();

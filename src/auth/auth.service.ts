@@ -14,7 +14,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  // Public registration: always creates users with client role.
+  // Public registration: always creates users with client role
   async register(dto: RegisterDto): Promise<User> {
     return this.usersService.create({
       name: dto.name,

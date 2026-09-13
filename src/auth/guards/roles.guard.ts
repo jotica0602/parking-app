@@ -4,7 +4,7 @@ import { UserRole } from '../../common/enums';
 import { AuthUser } from '../decorators/current-user.decorator';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 
-// Global guard: checks the JWT role against the @Roles decorator on the endpoint.
+// Global guard: checks the JWT role against the @Roles decorator on the endpoint
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}

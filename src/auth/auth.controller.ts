@@ -24,7 +24,7 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
-  // Returns the identity of the current token. Useful for testing the JWT.
+  // Returns the identity of the current token (for testing the JWT)
   @Get('me')
   me(@CurrentUser() user: AuthUser) {
     return user;

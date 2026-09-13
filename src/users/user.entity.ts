@@ -22,7 +22,7 @@ export class User {
   @Column({ nullable: true })
   phone?: string;
 
-  /** Nunca se expone: ClassSerializerInterceptor lo elimina de las respuestas. */
+  // Never exposed: ClassSerializerInterceptor removes it from the responses
   @Exclude()
   @Column()
   passwordHash: string;
