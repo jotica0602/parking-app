@@ -10,7 +10,7 @@ export const typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
   useFactory: (config: ConfigService) => ({
     type: 'postgres',
     host: config.get<string>('POSTGRES_HOST', 'localhost'),
-    port: config.get<number>('POSTGRES_PORT', 5433),
+    port: config.get<number>('POSTGRES_PORT', 5432),
     username: config.get<string>('POSTGRES_USER', 'parking'),
     password: config.get<string>('POSTGRES_PASSWORD', 'parking'),
     database: config.get<string>('POSTGRES_DB', 'parking'),
