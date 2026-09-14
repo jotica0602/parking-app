@@ -55,7 +55,6 @@ export class UsersService {
     return this.usersRepository.findOneBy({ email });
   }
 
-  /** Caso de uso 3: actualización de usuario (solo admin). Deja log en MongoDB. */
   async update(
     id: string,
     dto: UpdateUserDto,
@@ -72,7 +71,7 @@ export class UsersService {
       }
     }
 
-    // Solo los campos realmente enviados (los opcionales llegan como undefined)
+    // Only the actually sent fields (the optional ones come as undefined)
     const { password, ...rest } = dto;
     const changes = Object.fromEntries(
       Object.entries(rest).filter(([, value]) => value !== undefined),
@@ -85,6 +84,7 @@ export class UsersService {
 
     const updatedFields = Object.keys(changes);
     if (password) {
+      
       updatedFields.push('password');
     }
     await this.logsService.record({

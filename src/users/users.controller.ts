@@ -39,7 +39,6 @@ export class UsersController {
     return this.usersService.findById(id);
   }
 
-  /** Caso de uso 3 del enunciado: PUT de usuario, solo admin. */
   @Put(':id')
   update(
     @Param('id', ParseUUIDPipe) id: string,
