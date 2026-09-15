@@ -13,7 +13,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  // Aplica @Exclude() de las entidades (p. ej. passwordHash) en todas las respuestas
+  // Applies @Exclude() from entities (like the password hash) on all responses
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   await app.listen(process.env.PORT ?? 3000);

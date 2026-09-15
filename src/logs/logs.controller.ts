@@ -8,7 +8,7 @@ import { LogsService } from './logs.service';
 export class LogsController {
   constructor(private readonly logsService: LogsService) {}
 
-  /** Caso de uso 4 del enunciado: acceso a logs, solo admin. */
+  // Use case 4 from the spec: log access, admin only
   @Get()
   @Roles(UserRole.ADMIN)
   findAll(@Query() query: QueryLogsDto) {

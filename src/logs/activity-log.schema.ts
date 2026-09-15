@@ -6,22 +6,26 @@ export type ActivityLogDocument = HydratedDocument<ActivityLog>;
 
 @Schema({ collection: 'activity_logs', timestamps: { createdAt: true, updatedAt: false } })
 export class ActivityLog {
-  @Prop({ required: true, enum: Object.values(LogAction), index: true })
+  @Prop({ type: String, required: true, enum: Object.values(LogAction), index: true })
   action: LogAction;
 
-  @Prop({ required: true, index: true })
+  @Prop({ type: String, required: true, index: true })
   actorId: string;
 
-  @Prop({ required: true, enum: Object.values(UserRole) })
-  actorRole: UserRole;
+  @Prop({
+    type: String,
+    required: true,
+    enum: [...Object.values(UserRole), 'system'],
+  })
+  actorRole: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   entityType: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   entityId: string;
 
-  /** Datos relevantes de la acción. Nunca contraseñas ni hashes. */
+  //Relevant action data. Never passwords or hashes
   @Prop({ type: Object, default: {} })
   payload: Record<string, unknown>;
 

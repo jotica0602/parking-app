@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { LogAction, UserRole } from '../common/enums';
+import { LogAction, SYSTEM_ACTOR_ROLE, UserRole } from '../common/enums';
 import { ActivityLog } from './activity-log.schema';
 import { QueryLogsDto } from './dto/query-logs.dto';
 
 export interface RecordLogInput {
   action: LogAction;
   actorId: string;
-  actorRole: UserRole;
+  actorRole: UserRole | typeof SYSTEM_ACTOR_ROLE;
   entityType: string;
   entityId: string;
   payload?: Record<string, unknown>;
@@ -21,12 +21,12 @@ export class LogsService {
     private readonly logModel: Model<ActivityLog>,
   ) {}
 
-  /** Registra una acción crítica. Lo llaman los services de negocio. */
+  // Records a critical action. Called by the business services
   async record(input: RecordLogInput): Promise<void> {
     await this.logModel.create({ ...input, payload: input.payload ?? {} });
   }
 
-  /** Caso de uso 4: consulta de logs, solo admin. */
+  // Use case 4: log query, admin only.
   async findAll(query: QueryLogsDto): Promise<Record<string, unknown>[]> {
     const filter: Record<string, unknown> = {};
     if (query.action) {
@@ -45,7 +45,7 @@ export class LogsService {
       }
       filter.createdAt = createdAt;
     }
-    // lean() devuelve objetos planos, serializables sin internals de Mongoose
+    // lean() returns plain objects, serializable without Mongoose internals
     const docs = await this.logModel
       .find(filter)
       .sort({ createdAt: -1 })
