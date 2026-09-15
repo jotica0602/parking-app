@@ -10,7 +10,7 @@
     "start:dev": "nest start --watch",
     "start:prod": "node dist/main",
     "test": "jest",
-    "test:e2e": "jest --config ./test/jest-e2e.json --runInBand"
+    "test:e2e": "node -r ts-node/register --test test/parking.e2e-spec.ts"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
@@ -41,6 +41,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^26.5.0",
     "@types/passport-jwt": "^4.0.1",
+    "@types/pg": "^8.23.1",
     "@types/supertest": "^7.2.1",
     "jest": "^30.5.1",
     "supertest": "^7.2.2",
