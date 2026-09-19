@@ -26,7 +26,7 @@ export class UsersService {
       email: dto.email,
     });
     if (existing) {
-      throw new ConflictException('Ya existe un usuario con ese email');
+      throw new ConflictException('A user with that email already exists');
     }
 
     const user = this.usersRepository.create({
@@ -46,7 +46,7 @@ export class UsersService {
   async findById(id: string): Promise<User> {
     const user = await this.usersRepository.findOneBy({ id });
     if (!user) {
-      throw new NotFoundException('Usuario no encontrado');
+      throw new NotFoundException('User not found');
     }
     return user;
   }
@@ -67,7 +67,7 @@ export class UsersService {
         email: dto.email,
       });
       if (existing) {
-        throw new ConflictException('Ya existe un usuario con ese email');
+        throw new ConflictException('A user with that email already exists');
       }
     }
 

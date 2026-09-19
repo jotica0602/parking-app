@@ -12,10 +12,17 @@ import { SessionsModule } from './sessions/sessions.module';
 import { SpotsModule } from './spots/spots.module';
 import { UsersModule } from './users/users.module';
 import { VehiclesModule } from './vehicles/vehicles.module';
+import { AppController } from './app.controller';
+
+const nodeEnv = process.env.NODE_ENV;
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: nodeEnv === 'test' ? '.env.test' : ['.env.development', '.env'],
+      ignoreEnvFile: nodeEnv === 'production',
+    }),
     TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
     MongooseModule.forRootAsync(mongooseAsyncConfig),
     AuthModule,
@@ -27,5 +34,6 @@ import { VehiclesModule } from './vehicles/vehicles.module';
     SessionsModule,
     OccupancyModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}

@@ -20,7 +20,14 @@ npm run start:dev
 
 La API queda en `http://localhost:3000/api`.
 
-PostgreSQL se publica en el puerto **5433** del host (el 5432 suele estar ocupado por una instalación local). MongoDB usa el **27017**.
+Docker levanta **dos pares de bases**, para que desarrollo y tests no se pisen:
+
+| Entorno | PostgreSQL | MongoDB |
+|---|---|---|
+| Desarrollo (`.env`) | `localhost:5433` / `parking` | `localhost:27017` / `parking_logs` |
+| Tests (`.env.test`) | `localhost:5434` / `parking_test` | `localhost:27018` / `parking_logs_test` |
+
+El 5432 del host suele estar ocupado por una instalación local de PostgreSQL; por eso el contenedor de desarrollo usa **5433**.
 
 ### Primer administrador
 
@@ -118,13 +125,14 @@ Acciones registradas: `reservation_created`, `reservation_cancelled`, `reservati
 
 ## Tests e2e
 
-Necesitan PostgreSQL y MongoDB en marcha. Usan la base `parking_e2e` (la crea el test si no existe) y Mongo `parking_logs_e2e`.
+Un spec por módulo, junto al código (`src/<módulo>/<módulo>.e2e-spec.ts`). `npm run test:e2e` usa `.env.test` y las bases de los contenedores `*-test`.
 
 ```bash
+docker compose up -d
 npm run test:e2e
 ```
 
-Cubren los cuatro casos de uso del enunciado (reservar plaza, ocupación, actualizar usuario, consultar logs), incluyendo denegaciones por rol.
+Helpers compartidos: `test/support/app.ts` (`createTestApp`, `get`/`post`/`put`/`delete`, `reset`) y `test/support/factories.ts`.
 
 ## Postman
 
@@ -134,7 +142,7 @@ Importa [postman/Parking_API.postman_collection.json](postman/Parking_API.postma
 
 | Script | Descripción |
 |---|---|
-| `npm run start:dev` | API en modo watch |
+| `npm run start:dev` | API en modo watch (`NODE_ENV=development`) |
 | `npm run build` | Compilar |
-| `npm run start:prod` | Ejecutar `dist/main` |
-| `npm run test:e2e` | Pruebas e2e |
+| `npm run start:prod` | Ejecutar `dist/main` (`NODE_ENV=production`) |
+| `npm run test:e2e` | Pruebas e2e (`NODE_ENV=test`, `.env.test`) |

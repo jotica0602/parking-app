@@ -7,10 +7,10 @@
   "scripts": {
     "build": "nest build",
     "start": "nest start",
-    "start:dev": "nest start --watch",
-    "start:prod": "node dist/main",
-    "test": "jest",
-    "test:e2e": "node -r ts-node/register --test test/parking.e2e-spec.ts"
+    "start:dev": "NODE_ENV=development nest start --watch",
+    "start:prod": "NODE_ENV=production node dist/main",
+    "test": "npm run test:e2e",
+    "test:e2e": "NODE_ENV=test node --env-file=.env.test --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest-e2e.json --runInBand"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",

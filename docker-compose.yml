@@ -13,6 +13,19 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  postgres-test:
+    image: postgres:16-alpine
+    container_name: parking-postgres-test
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: parking
+      POSTGRES_PASSWORD: parking
+      POSTGRES_DB: parking_test
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata_test:/var/lib/postgresql/data
+
   mongo:
     image: mongo:7
     container_name: parking-mongo
@@ -22,6 +35,17 @@ services:
     volumes:
       - mongodata:/data/db
 
+  mongo-test:
+    image: mongo:7
+    container_name: parking-mongo-test
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodata_test:/data/db
+
 volumes:
   pgdata:
+  pgdata_test:
   mongodata:
+  mongodata_test:

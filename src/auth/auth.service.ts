@@ -30,7 +30,7 @@ export class AuthService {
     const passwordOk =
       user && (await bcrypt.compare(dto.password, user.passwordHash));
     if (!user || !passwordOk) {
-      throw new UnauthorizedException('Credenciales inválidas');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     const accessToken = await this.jwtService.signAsync({
