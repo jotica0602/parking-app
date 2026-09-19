@@ -142,12 +142,14 @@ export class ReservationsService {
       );
     }
 
-    reservation.spotId = spotId;
-    reservation.startAt = startAt;
-    reservation.endAt = endAt;
-    reservation.vehicleId = vehicleId;
-    await this.reservationsRepository.save(reservation);
-    return this.findById(reservation.id);
+    await this.reservationsRepository.update(id, {
+      userId: reservation.userId,
+      vehicleId,
+      spotId,
+      startAt,
+      endAt,
+    });
+    return this.findById(id);
   }
 
   async cancel(id: string, actor: AuthUser): Promise<Reservation> {
