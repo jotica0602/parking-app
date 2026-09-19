@@ -124,7 +124,7 @@ export class SessionsService {
   }
 
   async update(id: string, dto: UpdateSessionDto): Promise<ParkingSession> {
-    const session = await this.findById(id);
+    await this.findById(id);
     const changes = Object.fromEntries(
       Object.entries({
         spotId: dto.spotId,
@@ -133,8 +133,9 @@ export class SessionsService {
         exitedAt: dto.exitedAt ? new Date(dto.exitedAt) : undefined,
       }).filter(([, value]) => value !== undefined),
     );
-    Object.assign(session, changes);
-    await this.sessionsRepository.save(session);
+    if (Object.keys(changes).length) {
+      await this.sessionsRepository.update(id, changes);
+    }
     return this.findById(id);
   }
 
