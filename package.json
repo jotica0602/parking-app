@@ -9,6 +9,12 @@
     "start": "nest start",
     "start:dev": "NODE_ENV=development nest start --watch",
     "start:prod": "NODE_ENV=production node dist/main",
+    "typeorm": "node --env-file=.env ./node_modules/typeorm/cli-ts-node-commonjs.js -d src/data-source.ts",
+    "migration:generate": "npm run typeorm -- migration:generate",
+    "migration:create": "typeorm-ts-node-commonjs migration:create",
+    "migration:run": "npm run typeorm -- migration:run",
+    "migration:revert": "npm run typeorm -- migration:revert",
+    "migration:show": "npm run typeorm -- migration:show",
     "test": "npm run test:e2e",
     "test:e2e": "NODE_ENV=test node --env-file=.env.test --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest-e2e.json --runInBand"
   },

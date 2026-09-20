@@ -103,4 +103,47 @@ export class UsersService {
     const user = await this.findById(id);
     await this.usersRepository.remove(user);
   }
+
+  /**
+   * Ensures the .env admin exists with that email, password and role.
+   * Creates the user if missing; otherwise promotes and syncs the password.
+   */
+  async ensureBootstrapAdmin(input: {
+    name: string;
+    email: string;
+    password: string;
+  }): Promise<'created' | 'updated' | 'unchanged'> {
+    const existing = await this.usersRepository.findOneBy({
+      email: input.email,
+    });
+
+    if (!existing) {
+      await this.usersRepository.save(
+        this.usersRepository.create({
+          name: input.name,
+          email: input.email,
+          role: UserRole.ADMIN,
+          passwordHash: await bcrypt.hash(input.password, 10),
+        }),
+      );
+      return 'created';
+    }
+
+    let changed = false;
+    if (existing.role !== UserRole.ADMIN) {
+      existing.role = UserRole.ADMIN;
+      changed = true;
+    }
+    if (!(await bcrypt.compare(input.password, existing.passwordHash))) {
+      existing.passwordHash = await bcrypt.hash(input.password, 10);
+      changed = true;
+    }
+
+    if (!changed) {
+      return 'unchanged';
+    }
+
+    await this.usersRepository.save(existing);
+    return 'updated';
+  }
 }

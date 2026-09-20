@@ -33,4 +33,9 @@ Thumbs.db
 # Lock files
 package-lock.json
 
-docs/
+# Design notes — not published
+docs/*
+!docs/getting-started.md
+!docs/api.md
+
+migrations/

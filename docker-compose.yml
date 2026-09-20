@@ -6,9 +6,8 @@ services:
     environment:
       POSTGRES_USER: parking
       POSTGRES_PASSWORD: parking
-      POSTGRES_DB: parking
+      POSTGRES_DB: parking_db
     ports:
-      # 5433 en el host para no chocar con un PostgreSQL local en 5432
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -20,7 +19,7 @@ services:
     environment:
       POSTGRES_USER: parking
       POSTGRES_PASSWORD: parking
-      POSTGRES_DB: parking_test
+      POSTGRES_DB: parking_db_test
     ports:
       - "5434:5432"
     volumes:
@@ -30,6 +29,8 @@ services:
     image: mongo:7
     container_name: parking-mongo
     restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: parking_logs
     ports:
       - "27017:27017"
     volumes:
@@ -39,6 +40,8 @@ services:
     image: mongo:7
     container_name: parking-mongo-test
     restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: parking_logs_test
     ports:
       - "27018:27017"
     volumes:
