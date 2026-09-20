@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { postgresConnection } from './config/typeorm.options';
+import { postgresConnection } from './config/database/typeorm.options';
 import { Reservation } from './reservations/reservation.entity';
 import { ParkingSession } from './sessions/parking-session.entity';
 import { ParkingSpot } from './spots/parking-spot.entity';

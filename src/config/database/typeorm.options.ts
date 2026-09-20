@@ -10,7 +10,7 @@ export type PostgresEnv = {
 };
 
 export const typeOrmMigrations = [
-  join(__dirname, '..', 'migrations', '*.{ts,js}'),
+  join(__dirname, '..', '..', 'migrations', '*.{ts,js}'),
 ];
 
 export function postgresConnection(env: PostgresEnv): DataSourceOptions {

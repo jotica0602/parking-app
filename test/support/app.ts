@@ -6,7 +6,7 @@ import { Connection } from 'mongoose';
 import request from 'supertest';
 import { DataSource } from 'typeorm';
 import { AppModule } from '../../src/app.module';
-import { configureApp } from '../../src/config/configure-app';
+import { configureApp } from '../../src/config/app/configure-app';
 
 type Http = ReturnType<typeof request>;
 type Auth = string | { token: string };

@@ -3,8 +3,9 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
-import { mongooseAsyncConfig } from './config/mongoose.config';
-import { typeOrmAsyncConfig } from './config/typeorm.config';
+import { envConfig } from './config/app/env.config';
+import { mongooseAsyncConfig } from './config/database/mongoose.config';
+import { typeOrmAsyncConfig } from './config/database/typeorm.config';
 import { LogsModule } from './logs/logs.module';
 import { OccupancyModule } from './occupancy/occupancy.module';
 import { ReservationsModule } from './reservations/reservations.module';
@@ -14,15 +15,9 @@ import { UsersModule } from './users/users.module';
 import { VehiclesModule } from './vehicles/vehicles.module';
 import { AppController } from './app.controller';
 
-const nodeEnv = process.env.NODE_ENV;
-
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: nodeEnv === 'test' ? '.env.test' : ['.env.development', '.env'],
-      ignoreEnvFile: nodeEnv === 'production',
-    }),
+    ConfigModule.forRoot(envConfig),
     TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
     MongooseModule.forRootAsync(mongooseAsyncConfig),
     AuthModule,
