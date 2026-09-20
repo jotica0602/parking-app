@@ -24,7 +24,7 @@ API: `http://localhost:3000/api` (`curl` → `I'm alive!`).
 
 ## Migraciones
 
-Si es la primera vez que se corre la aplicación o si se realiza algún cambio en una entidad: genera y luego corre.
+Si es la primera vez que se levanta la aplicación o si se realiza algún cambio en una entidad: genere y luego corra las migraciones.
 
 ```bash
 npm run migration:generate -- src/migrations/NombreDelCambio
