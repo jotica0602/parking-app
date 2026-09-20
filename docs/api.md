@@ -1,86 +1,183 @@
 # Cómo usar la API
 
-Base: `http://localhost:3000/api`.
+Base: `http://localhost:3000/api`
 
-Salvo las rutas públicas, todas piden JWT:
+Casi todo pide JWT:
 
 ```http
 Authorization: Bearer <accessToken>
 ```
 
-JSON en el cuerpo. Campos extra → `400`. `passwordHash` no se devuelve.
+Cuerpo en JSON. Un campo de más → `400`. `passwordHash` no se devuelve nunca.
 
-| Código | Significado |
+Públicas (sin token): `GET /`, `POST /auth/register`, `POST /auth/login`.
+
+| | Significado |
 |---|---|
-| `200` / `201` / `204` | OK (lectura/alta/borrado) |
+| `200` `201` `204` | Lectura, creación, eliminación |
 | `400` | Validación o regla de negocio |
-| `401` | Sin token o credenciales inválidas |
+| `401` | Sin token o login incorrecto |
 | `403` | Rol o recurso ajeno |
 | `404` | No existe |
 | `409` | Conflicto (email, matrícula, plaza, solape, sesión abierta) |
 
-## Roles
+## Quién hace qué
 
-| Rol | Acceso |
+| Rol | Alcance |
 |---|---|
 | `client` | Sus vehículos y reservas |
 | `employee` | Ocupación, sesiones, lectura de plazas y reservas |
-| `admin` | Todo, más usuarios, plazas y logs |
+| `admin` | Todo: usuarios, plazas y logs |
 
-## Endpoints
+El primer admin sale de `ADMIN_EMAIL` / `ADMIN_PASSWORD` en `.env`. El registro público solo crea `client`. Un admin crea empleados y otros admins.
 
-Públicos: `GET /`, `POST /auth/register`, `POST /auth/login`.
+## Recorrido
 
-| Método | Ruta | Roles |
-|---|---|---|
-| `GET` | `/` | público |
-| `POST` | `/auth/register` | público (siempre crea `client`) |
-| `POST` | `/auth/login` | público → `{ accessToken, user }` |
-| `GET` | `/auth/me` | autenticado |
-| `POST` `GET` `PUT` `DELETE` | `/users`, `/users/:id` | `admin` |
-| `POST` `GET` `PUT` `DELETE` | `/vehicles`, `/vehicles/:id` | `client`, `admin` |
-| `POST` `PUT` `DELETE` | `/spots`, `/spots/:id` | `admin` |
-| `GET` | `/spots`, `/spots/:id` | `admin`, `employee` |
-| `POST` `PUT` | `/reservations`, `/reservations/:id` | `client`, `admin` |
-| `GET` | `/reservations`, `/reservations/:id` | `client` (propias), `employee`, `admin` |
-| `POST` | `/reservations/:id/cancel` | `client`, `admin` |
-| `DELETE` | `/reservations/:id` | `client`, `admin` (cancela si está `confirmed`) |
-| `POST` `GET` `PUT` `DELETE` | `/sessions`, `/sessions/:id` | `employee`, `admin` |
-| `POST` | `/sessions/:id/close` | `employee`, `admin` |
-| `GET` | `/occupancy` | `employee`, `admin` |
-| `GET` | `/logs` | `admin` |
-
-## Cuerpos
-
-**Registro / login**
-
-```json
-{ "name": "Ana", "email": "ana@parking.test", "password": "Password123!", "phone": "600123123" }
-{ "email": "admin@parking.test", "password": "Password123!" }
-```
-
-El admin inicial sale de `ADMIN_EMAIL` / `ADMIN_PASSWORD` en `.env`.
-
-**Usuario** (admin): `name`, `email`, `password` (≥ 8), `phone?`, `role?` (`admin` \| `employee` \| `client`).
-
-**Vehículo**: `licensePlate`, `brand?`, `model?`, `color?`. `ownerId` solo lo aplica un admin.
-
-**Plaza**: `code`, `floor?`, `type?` (`standard` \| `disabled` \| `electric`).
-
-**Reserva**: `vehicleId`, `startAt`, `endAt` (ISO 8601). `spotId` opcional: si falta, se asigna una plaza libre. Solape → `409`. Estados: `confirmed`, `cancelled`, `completed`, `expired` (no-show).
-
-**Sesión**: `vehicleId`, `spotId`, `reservationId?`, `enteredAt?`. Cerrar: `POST /sessions/:id/close`.
-
-**Ocupación**: cada plaza es `occupied` (sesión abierta), `reserved` (reserva vigente) o `free`.
-
-**Logs**: `GET /logs?action=&actorId=&from=&to=`. Acciones: `reservation_created`, `reservation_cancelled`, `reservation_expired`, `vehicle_entry`, `vehicle_exit`, `user_updated`.
-
-## Flujo
-
-1. `POST /auth/login` con el admin de `.env` (ver [cómo ejecutar](getting-started.md#primer-admin)).
-2. Guardar `accessToken`.
-3. Admin: `POST /spots`. Cliente: `POST /vehicles` y `POST /reservations`.
+1. `POST /auth/login` con el admin de `.env` → guarda `accessToken`.
+2. Admin: `POST /spots` (hace falta al menos una plaza).
+3. Cliente: `POST /vehicles` y `POST /reservations`.
 4. Employee: `GET /occupancy`, `POST /sessions`, `POST /sessions/:id/close`.
 5. Admin: `GET /logs`.
 
-Colección Postman: [postman/Parking_API.postman_collection.json](../postman/Parking_API.postman_collection.json). Importa, haz **Auth → Login** (rellena `accessToken`) y llama al resto.
+En Postman: importa [Parking_API.postman_collection.json](../postman/Parking_API.postman_collection.json), ejecuta **Auth → Login** (rellena `accessToken`) y sigue el resto.
+
+---
+
+## Auth
+
+| | Ruta | Quién |
+|---|---|---|
+| `POST` | `/auth/register` | público → siempre `client` |
+| `POST` | `/auth/login` | público → `{ accessToken, user }` |
+| `GET` | `/auth/me` | autenticado |
+
+Registro:
+
+```json
+{
+  "name": "Ana",
+  "email": "ana@parking.test",
+  "password": "Password123!",
+  "phone": "600123123"
+}
+```
+
+`phone` es opcional. `password` mínimo 8 caracteres.
+
+Login:
+
+```json
+{
+  "email": "admin@parking.test",
+  "password": "Password123!"
+}
+```
+
+## Usuarios
+
+Solo `admin`. CRUD en `/users` y `/users/:id`.
+
+```json
+{
+  "name": "Luis",
+  "email": "empleado@parking.test",
+  "password": "Password123!",
+  "role": "employee"
+}
+```
+
+Campos: `name`, `email`, `password` (≥ 8). Opcionales: `phone`, `role` (`admin` \| `employee` \| `client`).
+
+## Vehículos
+
+`client` (los suyos) y `admin`. CRUD en `/vehicles` y `/vehicles/:id`.
+
+```json
+{
+  "licensePlate": "1234ABC",
+  "brand": "Seat",
+  "model": "Ibiza",
+  "color": "blue"
+}
+```
+
+Obligatorio: `licensePlate`. Opcionales: `brand`, `model`, `color`. `ownerId` solo lo aplica un admin.
+
+## Plazas
+
+Escribir: `admin`. Leer: `admin`, `employee`.
+
+| | Ruta |
+|---|---|
+| `POST` `PUT` `DELETE` | `/spots`, `/spots/:id` |
+| `GET` | `/spots`, `/spots/:id` |
+
+```json
+{
+  "code": "A-1",
+  "floor": 0,
+  "type": "standard"
+}
+```
+
+Obligatorio: `code`. Opcionales: `floor` (≥ 0), `type` (`standard` \| `disabled` \| `electric`).
+
+## Reservas
+
+Crear, cambiar y cancelar: `client`, `admin`. Leer: esos más `employee`. Un cliente solo ve las suyas.
+
+| | Ruta |
+|---|---|
+| `POST` | `/reservations` |
+| `GET` | `/reservations`, `/reservations/:id` |
+| `PUT` | `/reservations/:id` |
+| `POST` | `/reservations/:id/cancel` |
+| `DELETE` | `/reservations/:id` (cancela si está `confirmed`) |
+
+```json
+{
+  "vehicleId": "<uuid>",
+  "startAt": "2026-09-20T10:00:00.000Z",
+  "endAt": "2026-09-20T12:00:00.000Z"
+}
+```
+
+`spotId` es opcional: si falta, se asigna una plaza libre. Fechas en ISO 8601. Solape → `409`.
+
+Estados: `confirmed`, `cancelled`, `completed`, `expired` (no-show).
+
+## Sesiones
+
+`employee` y `admin`. Entrada y salida de vehículos.
+
+| | Ruta |
+|---|---|
+| `POST` | `/sessions` |
+| `GET` | `/sessions`, `/sessions/:id` |
+| `PUT` | `/sessions/:id` |
+| `POST` | `/sessions/:id/close` |
+| `DELETE` | `/sessions/:id` |
+
+```json
+{
+  "vehicleId": "<uuid>",
+  "spotId": "<uuid>",
+  "reservationId": "<uuid>"
+}
+```
+
+Obligatorios: `vehicleId`, `spotId`. Opcionales: `reservationId`, `enteredAt`.
+
+## Ocupación
+
+`GET /occupancy` — `employee`, `admin`.
+
+Cada plaza: `occupied` (sesión abierta), `reserved` (reserva vigente) o `free`.
+
+## Logs
+
+`GET /logs` — solo `admin`.
+
+Filtros: `?action=&actorId=&from=&to=`.
+
+Acciones: `reservation_created`, `reservation_cancelled`, `reservation_expired`, `vehicle_entry`, `vehicle_exit`, `user_updated`.

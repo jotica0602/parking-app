@@ -24,13 +24,13 @@ API: `http://localhost:3000/api` (`curl` → `I'm alive!`).
 
 ## Migraciones
 
-La primera vez, o si cambias una entidad: genera y luego corre.
+Si es la primera vez que se corre la aplicación o si se realiza algún cambio en una entidad: genera y luego corre.
 
 ```bash
 npm run migration:generate -- src/migrations/NombreDelCambio
 npm run migration:run
 ```
 
-Si ya existen archivos en `src/migrations/`, basta con `migration:run`. `start:dev` aplica las pendientes al arrancar.
+Si ya existen archivos en `src/migrations/`, basta aplicar `migration:run` para aplicar las pendientes y luego arrancar con `start:dev`.
 
 Más detalle: [Cómo ejecutar](docs/getting-started.md).
