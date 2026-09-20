@@ -1,8 +1,12 @@
 {
   "info": {
     "name": "Parking API",
-    "description": "REST API for parking management (NestJS). Set baseUrl and run Auth → Login to populate accessToken.",
+    "description": "Importa la colección, ajusta baseUrl y ejecuta Auth → Login para rellenar accessToken.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
   },
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:3000/api" },
@@ -15,16 +19,30 @@
   ],
   "item": [
     {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Alive",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{baseUrl}}"
+          }
+        }
+      ]
+    },
+    {
       "name": "Auth",
       "item": [
         {
           "name": "Register",
           "request": {
+            "auth": { "type": "noauth" },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Ana Cliente\",\n  \"email\": \"ana@test.com\",\n  \"password\": \"password123\",\n  \"phone\": \"600111222\"\n}"
+              "raw": "{\n  \"name\": \"Ana Cliente\",\n  \"email\": \"ana@parking.test\",\n  \"password\": \"Password123!\",\n  \"phone\": \"600111222\"\n}"
             },
             "url": "{{baseUrl}}/auth/register"
           }
@@ -45,11 +63,38 @@
             }
           ],
           "request": {
+            "auth": { "type": "noauth" },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"ana@test.com\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"email\": \"ana@parking.test\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Login admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) pm.collectionVariables.set('accessToken', json.accessToken);",
+                  "if (json.user && json.user.id) pm.collectionVariables.set('userId', json.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@parking.test\",\n  \"password\": \"Password123!\"\n}"
             },
             "url": "{{baseUrl}}/auth/login"
           }
@@ -58,9 +103,6 @@
           "name": "Me",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
             "url": "{{baseUrl}}/auth/me"
           }
         }
@@ -73,61 +115,37 @@
           "name": "Create user",
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Luis Empleado\",\n  \"email\": \"empleado@test.com\",\n  \"password\": \"password123\",\n  \"role\": \"employee\"\n}"
+              "raw": "{\n  \"name\": \"Luis Empleado\",\n  \"email\": \"empleado@parking.test\",\n  \"password\": \"Password123!\",\n  \"role\": \"employee\"\n}"
             },
             "url": "{{baseUrl}}/users"
           }
         },
         {
           "name": "List users",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/users"
-          }
+          "request": { "method": "GET", "url": "{{baseUrl}}/users" }
         },
         {
           "name": "Get user",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/users/{{userId}}"
-          }
+          "request": { "method": "GET", "url": "{{baseUrl}}/users/{{userId}}" }
         },
         {
           "name": "Update user",
           "request": {
             "method": "PUT",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Ana Cliente Editada\",\n  \"phone\": \"611222333\"\n}"
+              "raw": "{\n  \"name\": \"Ana Editada\",\n  \"phone\": \"611222333\"\n}"
             },
             "url": "{{baseUrl}}/users/{{userId}}"
           }
         },
         {
           "name": "Delete user",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/users/{{userId}}"
-          }
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/users/{{userId}}" }
         }
       ]
     },
@@ -150,61 +168,34 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"licensePlate\": \"ABC-123\",\n  \"brand\": \"Toyota\",\n  \"model\": \"Corolla\",\n  \"color\": \"blue\"\n}"
+              "raw": "{\n  \"licensePlate\": \"1234ABC\",\n  \"brand\": \"Seat\",\n  \"model\": \"Ibiza\",\n  \"color\": \"blue\"\n}"
             },
             "url": "{{baseUrl}}/vehicles"
           }
         },
         {
           "name": "List vehicles",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/vehicles"
-          }
+          "request": { "method": "GET", "url": "{{baseUrl}}/vehicles" }
         },
         {
           "name": "Get vehicle",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/vehicles/{{vehicleId}}"
-          }
+          "request": { "method": "GET", "url": "{{baseUrl}}/vehicles/{{vehicleId}}" }
         },
         {
           "name": "Update vehicle",
           "request": {
             "method": "PUT",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"color\": \"red\"\n}"
-            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"color\": \"red\"\n}" },
             "url": "{{baseUrl}}/vehicles/{{vehicleId}}"
           }
         },
         {
           "name": "Delete vehicle",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/vehicles/{{vehicleId}}"
-          }
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/vehicles/{{vehicleId}}" }
         }
       ]
     },
@@ -227,61 +218,34 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"code\": \"A-01\",\n  \"floor\": 1,\n  \"type\": \"standard\"\n}"
+              "raw": "{\n  \"code\": \"A-1\",\n  \"floor\": 0,\n  \"type\": \"standard\"\n}"
             },
             "url": "{{baseUrl}}/spots"
           }
         },
         {
           "name": "List spots",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/spots"
-          }
+          "request": { "method": "GET", "url": "{{baseUrl}}/spots" }
         },
         {
           "name": "Get spot",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/spots/{{spotId}}"
-          }
+          "request": { "method": "GET", "url": "{{baseUrl}}/spots/{{spotId}}" }
         },
         {
           "name": "Update spot",
           "request": {
             "method": "PUT",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"type\": \"electric\"\n}"
-            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"type\": \"electric\"\n}" },
             "url": "{{baseUrl}}/spots/{{spotId}}"
           }
         },
         {
           "name": "Delete spot",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/spots/{{spotId}}"
-          }
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/spots/{{spotId}}" }
         }
       ]
     },
@@ -305,48 +269,30 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"vehicleId\": \"{{vehicleId}}\",\n  \"startAt\": \"2026-09-15T10:00:00.000Z\",\n  \"endAt\": \"2026-09-15T12:00:00.000Z\"\n}"
+              "raw": "{\n  \"vehicleId\": \"{{vehicleId}}\",\n  \"spotId\": \"{{spotId}}\",\n  \"startAt\": \"2026-09-20T10:00:00.000Z\",\n  \"endAt\": \"2026-09-20T12:00:00.000Z\"\n}"
             },
             "url": "{{baseUrl}}/reservations"
           }
         },
         {
           "name": "List reservations",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/reservations"
-          }
+          "request": { "method": "GET", "url": "{{baseUrl}}/reservations" }
         },
         {
           "name": "Get reservation",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/reservations/{{reservationId}}"
-          }
+          "request": { "method": "GET", "url": "{{baseUrl}}/reservations/{{reservationId}}" }
         },
         {
           "name": "Update reservation",
           "request": {
             "method": "PUT",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"endAt\": \"2026-09-15T13:00:00.000Z\"\n}"
+              "raw": "{\n  \"endAt\": \"2026-09-20T13:00:00.000Z\"\n}"
             },
             "url": "{{baseUrl}}/reservations/{{reservationId}}"
           }
@@ -355,21 +301,12 @@
           "name": "Cancel reservation",
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
             "url": "{{baseUrl}}/reservations/{{reservationId}}/cancel"
           }
         },
         {
           "name": "Delete reservation",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/reservations/{{reservationId}}"
-          }
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/reservations/{{reservationId}}" }
         }
       ]
     },
@@ -392,10 +329,7 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"vehicleId\": \"{{vehicleId}}\",\n  \"spotId\": \"{{spotId}}\",\n  \"reservationId\": \"{{reservationId}}\"\n}"
@@ -405,58 +339,31 @@
         },
         {
           "name": "List sessions",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/sessions"
-          }
+          "request": { "method": "GET", "url": "{{baseUrl}}/sessions" }
         },
         {
           "name": "Get session",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/sessions/{{sessionId}}"
-          }
+          "request": { "method": "GET", "url": "{{baseUrl}}/sessions/{{sessionId}}" }
         },
         {
-          "name": "Register exit",
+          "name": "Close session",
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/sessions/{{sessionId}}/exit"
+            "url": "{{baseUrl}}/sessions/{{sessionId}}/close"
           }
         },
         {
           "name": "Update session",
           "request": {
             "method": "PUT",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"spotId\": \"{{spotId}}\"\n}"
-            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"spotId\": \"{{spotId}}\"\n}" },
             "url": "{{baseUrl}}/sessions/{{sessionId}}"
           }
         },
         {
           "name": "Delete session",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/sessions/{{sessionId}}"
-          }
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/sessions/{{sessionId}}" }
         }
       ]
     },
@@ -465,13 +372,7 @@
       "item": [
         {
           "name": "Get occupancy",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/occupancy"
-          }
+          "request": { "method": "GET", "url": "{{baseUrl}}/occupancy" }
         }
       ]
     },
@@ -482,10 +383,17 @@
           "name": "List logs",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
-            ],
-            "url": "{{baseUrl}}/logs?action=reservation_created"
+            "url": {
+              "raw": "{{baseUrl}}/logs?action=reservation_created",
+              "host": ["{{baseUrl}}"],
+              "path": ["logs"],
+              "query": [
+                { "key": "action", "value": "reservation_created" },
+                { "key": "actorId", "value": "", "disabled": true },
+                { "key": "from", "value": "", "disabled": true },
+                { "key": "to", "value": "", "disabled": true }
+              ]
+            }
           }
         }
       ]
